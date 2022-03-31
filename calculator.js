@@ -127,6 +127,12 @@ for(let i = 0; i < numberEle.length; i++){
 /* Event listener for operations and display current result */
 for(let i = 0; i < opEle.length; i++){
     opEle[i].addEventListener("click", () => {
+        /* Set default for next number */
+        let decimal = document.querySelector("#decimal");
+        decimal.disabled = false;
+        decimal = false;
+        sign = false;
+
         let op = opEle[i].textContent;
         if(op === "C"){
             currNum = 0;
@@ -144,7 +150,7 @@ for(let i = 0; i < opEle.length; i++){
 
             display.textContent = currNum;
         }
-        else if(op !== "="){
+        else if(op !== "=" && currNum !== ""){
             /*
             let y = numParser();
             let x = queue.dequeue();
@@ -159,17 +165,28 @@ for(let i = 0; i < opEle.length; i++){
             currNum = "";
             */
             /* If any operator was pressed after "=" */
+            /*
             if(queue.length !== 1){
                 let item = numParser();
                 queue.enqueue(item);
             }
-            queue.enqueue(op);
+            */
+            if(queue.length === 1){
+                queue.enqueue(op);
+            }
+            else{
+                let item = numParser();
+                queue.enqueue(item);
+                queue.enqueue(op);
+            }
             currNum = "";
         }
-        else{
-            if(queue.length === 0 || typeof queue.peekTail === 'string'){
+        else if(op === "=" && typeof queue.peekTail() === 'string'){
+            /* "=" immediately after operator */
+            /*
+            if(!Number.isInteger(queue.peekTail())){
                 currNum = "0";
-            }
+            }*/
 
             let item = numParser();
             queue.enqueue(item);
@@ -195,13 +212,6 @@ for(let i = 0; i < opEle.length; i++){
             currNum = "";
             */
         }
-        /* Clear check comes at the bottom for reset purposes */
-        let decimal = document.querySelector("#decimal");
-        decimal.disabled = false;
-        decimal = false;
-
-        sign = false;
-        
     })
 }
 

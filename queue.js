@@ -21,7 +21,7 @@ export default class Queue{
     }
 
     peekTail(){
-        return this.item[this.tail];
+        return this.item[this.tail-1];
     }
 
     get length(){

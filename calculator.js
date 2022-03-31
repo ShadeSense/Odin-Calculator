@@ -92,13 +92,18 @@ for(let i = 0; i < numberEle.length; i++){
         display.textContent = "";
         let item = numberEle[i].textContent;
         if(item === "+/-"){
-            bool = !bool;
+            sign = !sign;
+            if(currNum === ""){
+                currNum = "0";
+            }
+            /*
             if(sign){
                 display.textContent = "-" + currNum;
             }
             else{
                 display.textContent = currNum;
             }
+            */
         }
         else if(item === "."){
             currNum += item;
@@ -108,7 +113,14 @@ for(let i = 0; i < numberEle.length; i++){
         else{
             currNum += item;
         }
-        display.textContent = toFixed(currNum, 8);
+
+        if(sign){
+            display.textContent = "-" + toFixed(currNum, 8);
+        }
+        else{
+            display.textContent = toFixed(currNum, 8);
+        }
+        //display.textContent = toFixed(currNum, 8);
     });
 }
 

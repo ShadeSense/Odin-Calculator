@@ -78,6 +78,7 @@ let opEle = document.querySelectorAll(".op");
 /* Event listener to for number buttons */
 for(let i = 0; i < numberEle.length; i++){
     numberEle[i].addEventListener("click", () => {
+        /* Check size of number to fit within div */
         if(validSize(currNum)){
             /* If any number was pressed after "=" */
             if(queue.length === 1){
@@ -86,7 +87,9 @@ for(let i = 0; i < numberEle.length; i++){
                 display.textContent = currNum;
             }
 
+            /* Reset div text */
             display.textContent = "";
+
             let item = numberEle[i].textContent;
             if(item === "+/-"){
                 sign = !sign;
@@ -99,12 +102,12 @@ for(let i = 0; i < numberEle.length; i++){
                 decimal = true;
                 numberEle[i].disabled = true;
             }
-            else{
+            else{ // Any number button
                 currNum += item;
             }
 
             if(sign){
-                display.textContent = "-" + toFixed(currNum, 8);
+                display.textContent = "-" + toFixed(currNum, 8); // Truncates decimals without rounding
             }
             else{
                 display.textContent = toFixed(currNum, 8);
@@ -123,18 +126,16 @@ for(let i = 0; i < opEle.length; i++){
         sign = false;
 
         let op = opEle[i].textContent;
-        if(op === "C"){
+        if(op === "C"){ // Clear
             currNum = 0;
             for(let i = 0; i < queue.length; i++){
                 queue.dequeue();
             }
-
             currNum = "";
-
             display.textContent = currNum;
         }
-        else if(op !== "=" && currNum !== ""){
-            if(queue.length === 1){
+        else if(op !== "=" && currNum !== ""){ // Any operations used after any numbers inputted
+            if(queue.length === 1){ // If operator buttons were immediately pressed after "="
                 queue.enqueue(op);
             }
             else{
@@ -144,10 +145,11 @@ for(let i = 0; i < opEle.length; i++){
             }
             currNum = "";
         }
-        else if(op === "=" && typeof queue.peekTail() === 'string'){
+        else if(op === "=" && typeof queue.peekTail() === 'string'){ // Makes sure "=" isn't pressed at start
             let item = numParser();
             queue.enqueue(item);
 
+            /* Finds total while expression exists */
             let total = queue.dequeue();
             while(queue.length !== 0){
                 let operator = queue.dequeue();
@@ -155,6 +157,7 @@ for(let i = 0; i < opEle.length; i++){
 
                 total = calculator.operate(operator, total, y);
             }
+            /* Re-queue total if number is to be used again */
             total = +(toFixed(total, 8));
             queue.enqueue(total);
             display.textContent = total;
@@ -167,7 +170,7 @@ for(let i = 0; i < opEle.length; i++){
 /* Parse string for queue */
 function numParser(){
     if(decimal){
-        currNum = +(toFixed(currNum, 8));
+        currNum = +(toFixed(currNum, 8)); // Ensures that currNum is an integer after trunc
     }
     else{
         currNum = parseInt(currNum);
@@ -180,7 +183,9 @@ function numParser(){
     return currNum;
 }
 
+/* Checks size of number to fit in div */
 function validSize(num){
+    /* Locates all digits, counts, and compare to allowable size */
     let size = num.match(/\d/g);
     size = [].concat.apply([], size);
     console.log(size.length);

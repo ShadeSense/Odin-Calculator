@@ -14,11 +14,11 @@ class Calculator{
     }
 
     divide(x, y){
-        if(x == 0){
+        if(x === 0){
             alert("Cannot divide by 0! Calculator is now cleared!");
-            let clear = querySelector("#btn-clear");
+            let clear = document.querySelector("#btn-clear");
             clear.click();
-            return console.log("Cannot divide by 0");
+            location.reload();
         }
 
         return x / y;
@@ -64,6 +64,15 @@ let sign = false;
 /* Usage for decimal */
 let decimal = false;
 
+/*  Truncating number without rounding
+    (cite: https://stackoverflow.com/questions/4187146/truncate-number-to-two-decimal-places-without-rounding)
+    (Author: Guya)
+*/
+function toFixed(number, fixed) {
+    let trunc = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return number.toString().match(trunc)[0];
+}
+
 /* Number buttons and sign & decimal */
 let numberEle = document.querySelectorAll(".num");
 
@@ -99,7 +108,7 @@ for(let i = 0; i < numberEle.length; i++){
         else{
             currNum += item;
         }
-        display.textContent = currNum;
+        display.textContent = toFixed(currNum, 8);
     });
 }
 
@@ -107,7 +116,23 @@ for(let i = 0; i < numberEle.length; i++){
 for(let i = 0; i < opEle.length; i++){
     opEle[i].addEventListener("click", () => {
         let op = opEle[i].textContent;
-        if(op !== "="){
+        if(op === "C"){
+            currNum = 0;
+            for(let i = 0; i < queue.length; i++){
+                queue.dequeue();
+            }
+
+
+            /* Default queue */
+            /*
+            queue.enqueue(0);
+            queue.enqueue("+");*/
+
+            currNum = "";
+
+            display.textContent = currNum;
+        }
+        else if(op !== "="){
             /*
             let y = numParser();
             let x = queue.dequeue();
@@ -129,7 +154,7 @@ for(let i = 0; i < opEle.length; i++){
             queue.enqueue(op);
             currNum = "";
         }
-        else if(op === "="){
+        else{
             if(queue.length === 0 || typeof queue.peekTail === 'string'){
                 currNum = "0";
             }
@@ -144,6 +169,7 @@ for(let i = 0; i < opEle.length; i++){
 
                 total = calculator.operate(operator, total, y);
             }
+            total = +(toFixed(total, 8));
             queue.enqueue(total);
             display.textContent = total;
             currNum = total.toString();
@@ -157,39 +183,12 @@ for(let i = 0; i < opEle.length; i++){
             currNum = "";
             */
         }
-        else{
-            /* Clear check comes at the bottom for reset purposes */
-            let decimal = document.querySelector("#btn-clear");
-            decimal.disabled = false;
-            decimal = false;
+        /* Clear check comes at the bottom for reset purposes */
+        let decimal = document.querySelector("#decimal");
+        decimal.disabled = false;
+        decimal = false;
 
-            sign = false;
-        }
-
-        if(op === "C"){
-            if(confirm("Are you sure you want to clear?")){
-                currNum = 0;
-                for(let i = 0; i < queue.length; i++){
-                    queue.dequeue();
-                }
-
-
-                /* Default queue */
-                /*
-                queue.enqueue(0);
-                queue.enqueue("+");*/
-
-                currNum = "";
-
-                display.textContent = currNum;
-
-                let decimal = document.querySelector("#decimal");
-                decimal.disabled = false;
-                decimal = false;
-
-                sign = false;
-            }
-        }
+        sign = false;
         
     })
 }
@@ -198,7 +197,7 @@ for(let i = 0; i < opEle.length; i++){
 /* Parse string for queue */
 function numParser(){
     if(decimal){
-        currNum = parseFloat(currNum);
+        currNum = +(toFixed(currNum, 8));
     }
     else{
         currNum = parseInt(currNum);

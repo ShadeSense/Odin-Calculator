@@ -1,16 +1,16 @@
-import {Queue} from './queue';
+import Queue from './queue.js';
 
 class Calculator{
     add(x, y){
-        return (x + y).toString();
+        return x + y;
     }
 
     subtract(x, y){
-        return (x - y).toString();
+        return x - y;
     }
 
     multiply(x, y){
-        return (x * y).toString();
+        return x * y;
     }
 
     divide(x, y){
@@ -21,22 +21,22 @@ class Calculator{
             return console.log("Cannot divide by 0");
         }
 
-        return (x / y).toString();
+        return x / y;
     }
 
     operate(op, x, y){
         switch (op){
             case "+":
-                return add(x, y);
+                return this.add(x, y);
                 break;
             case "-":
-                return subtract(x, y);
+                return this.subtract(x, y);
                 break;
             case "*":
-                return multiply(x, y);
+                return this.multiply(x, y);
                 break;
             case "/":
-                return divide(x, y);
+                return this.divide(x, y);
                 break;
             default:
                 console.log("Expression is invalid!");
@@ -47,11 +47,13 @@ class Calculator{
 
 const calculator = new Calculator();
 const queue = new Queue();
-queue.enqueue("0");
+/*
+queue.enqueue(0);
 queue.enqueue("+");
+*/
 
 /* Display */
-let display = querySelector(".display");
+let display = document.querySelector(".display");
 
 /* Keeps track of current amount */
 let currNum = "";
@@ -63,14 +65,22 @@ let sign = false;
 let decimal = false;
 
 /* Number buttons and sign & decimal */
-let numberEle = querySelectorAll(".num");
+let numberEle = document.querySelectorAll(".num");
 
 /* Operator buttons and clear*/
-let opEle = querySelectorAll(".op");
+let opEle = document.querySelectorAll(".op");
 
-/* Event listener to queue expression */
+/* Event listener to for number buttons */
 for(let i = 0; i < numberEle.length; i++){
     numberEle[i].addEventListener("click", () => {
+        /* If any number was pressed after "=" */
+        if(queue.length === 1){
+            queue.dequeue();
+            currNum = "";
+            display.textContent = currNum;
+        }
+
+        display.textContent = "";
         let item = numberEle[i].textContent;
         if(item === "+/-"){
             bool = !bool;
@@ -86,6 +96,9 @@ for(let i = 0; i < numberEle.length; i++){
             decimal = true;
             numberEle[i].disabled = true;
         }
+        else{
+            currNum += item;
+        }
         display.textContent = currNum;
     });
 }
@@ -94,43 +107,90 @@ for(let i = 0; i < numberEle.length; i++){
 for(let i = 0; i < opEle.length; i++){
     opEle[i].addEventListener("click", () => {
         let op = opEle[i].textContent;
+        if(op !== "="){
+            /*
+            let y = numParser();
+            let x = queue.dequeue();
+            let operator = queue.dequeue();
+            let item = calculator.operate(operator, x, y);
+            */
+            /* Setup for next operation */
+            /*
+            queue.enqueue(item);
+            queue.enqueue(op);
+
+            currNum = "";
+            */
+            /* If any operator was pressed after "=" */
+            if(queue.length !== 1){
+                let item = numParser();
+                queue.enqueue(item);
+            }
+            queue.enqueue(op);
+            currNum = "";
+        }
+        else if(op === "="){
+            if(queue.length === 0 || typeof queue.peekTail === 'string'){
+                currNum = "0";
+            }
+
+            let item = numParser();
+            queue.enqueue(item);
+
+            let total = queue.dequeue();
+            while(queue.length !== 0){
+                let operator = queue.dequeue();
+                let y = queue.dequeue();
+
+                total = calculator.operate(operator, total, y);
+            }
+            queue.enqueue(total);
+            display.textContent = total;
+            currNum = total.toString();
+
+            /*
+            let y = numParser();
+            let x = queue.dequeue();
+            let operator = queue.dequeue();
+            let item = calculator.operate(operator, x, y);
+
+            currNum = "";
+            */
+        }
+        else{
+            /* Clear check comes at the bottom for reset purposes */
+            let decimal = document.querySelector("#btn-clear");
+            decimal.disabled = false;
+            decimal = false;
+
+            sign = false;
+        }
+
         if(op === "C"){
             if(confirm("Are you sure you want to clear?")){
                 currNum = 0;
-                for(let i = 0; i < queue.length(); i++){
+                for(let i = 0; i < queue.length; i++){
                     queue.dequeue();
                 }
 
+
                 /* Default queue */
-                queue.enqueue("0");
-                queue.enqueue("+");
+                /*
+                queue.enqueue(0);
+                queue.enqueue("+");*/
+
                 currNum = "";
 
                 display.textContent = currNum;
 
-                let decimal = querySelector("#btn-clear");
+                let decimal = document.querySelector("#decimal");
                 decimal.disabled = false;
+                decimal = false;
+
+                sign = false;
             }
         }
-        else if(op !== "="){
-            let y = numParser();
-            let x = queue.dequeue();
-            let operator = queue.dequeue();
-            let item = calculator.operate(operator, x, y);
-
-            /* Setup for next operation */
-            queue.enqueue(item);
-            queue.enqueue(op);
-        }
-        else{
-            let y = numParser();
-            let x = queue.dequeue();
-            let operator = queue.dequeue();
-            let item = calculator.operate(operator, x, y);
-
-            display.textContent = item;
-            currNum = "";
-        }
+        
     })
 }
 

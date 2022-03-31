@@ -20,8 +20,8 @@ export default class Queue{
         return item;
     }
 
-    peek(){
-        return this.item[this.head];
+    peekTail(){
+        return this.item[this.tail];
     }
 
     get length(){

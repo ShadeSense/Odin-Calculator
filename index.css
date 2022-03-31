@@ -14,7 +14,7 @@ body{
 .display{
     flex: 1;
     font-size: 54px;
-    font-size: 1vw;
+    font-size: 4vw;
     height: 100px;
     width: 250px;
     text-align: right;

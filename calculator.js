@@ -47,10 +47,6 @@ class Calculator{
 
 const calculator = new Calculator();
 const queue = new Queue();
-/*
-queue.enqueue(0);
-queue.enqueue("+");
-*/
 
 /* Display */
 let display = document.querySelector(".display");
@@ -82,45 +78,38 @@ let opEle = document.querySelectorAll(".op");
 /* Event listener to for number buttons */
 for(let i = 0; i < numberEle.length; i++){
     numberEle[i].addEventListener("click", () => {
-        /* If any number was pressed after "=" */
-        if(queue.length === 1){
-            queue.dequeue();
-            currNum = "";
-            display.textContent = currNum;
-        }
-
-        display.textContent = "";
-        let item = numberEle[i].textContent;
-        if(item === "+/-"){
-            sign = !sign;
-            if(currNum === ""){
-                currNum = "0";
-            }
-            /*
-            if(sign){
-                display.textContent = "-" + currNum;
-            }
-            else{
+        if(validSize(currNum)){
+            /* If any number was pressed after "=" */
+            if(queue.length === 1){
+                queue.dequeue();
+                currNum = "";
                 display.textContent = currNum;
             }
-            */
-        }
-        else if(item === "."){
-            currNum += item;
-            decimal = true;
-            numberEle[i].disabled = true;
-        }
-        else{
-            currNum += item;
-        }
 
-        if(sign){
-            display.textContent = "-" + toFixed(currNum, 8);
+            display.textContent = "";
+            let item = numberEle[i].textContent;
+            if(item === "+/-"){
+                sign = !sign;
+                if(currNum === ""){
+                    currNum = "0";
+                }
+            }
+            else if(item === "."){
+                currNum += item;
+                decimal = true;
+                numberEle[i].disabled = true;
+            }
+            else{
+                currNum += item;
+            }
+
+            if(sign){
+                display.textContent = "-" + toFixed(currNum, 8);
+            }
+            else{
+                display.textContent = toFixed(currNum, 8);
+            }
         }
-        else{
-            display.textContent = toFixed(currNum, 8);
-        }
-        //display.textContent = toFixed(currNum, 8);
     });
 }
 
@@ -140,37 +129,11 @@ for(let i = 0; i < opEle.length; i++){
                 queue.dequeue();
             }
 
-
-            /* Default queue */
-            /*
-            queue.enqueue(0);
-            queue.enqueue("+");*/
-
             currNum = "";
 
             display.textContent = currNum;
         }
         else if(op !== "=" && currNum !== ""){
-            /*
-            let y = numParser();
-            let x = queue.dequeue();
-            let operator = queue.dequeue();
-            let item = calculator.operate(operator, x, y);
-            */
-            /* Setup for next operation */
-            /*
-            queue.enqueue(item);
-            queue.enqueue(op);
-
-            currNum = "";
-            */
-            /* If any operator was pressed after "=" */
-            /*
-            if(queue.length !== 1){
-                let item = numParser();
-                queue.enqueue(item);
-            }
-            */
             if(queue.length === 1){
                 queue.enqueue(op);
             }
@@ -182,12 +145,6 @@ for(let i = 0; i < opEle.length; i++){
             currNum = "";
         }
         else if(op === "=" && typeof queue.peekTail() === 'string'){
-            /* "=" immediately after operator */
-            /*
-            if(!Number.isInteger(queue.peekTail())){
-                currNum = "0";
-            }*/
-
             let item = numParser();
             queue.enqueue(item);
 
@@ -202,15 +159,6 @@ for(let i = 0; i < opEle.length; i++){
             queue.enqueue(total);
             display.textContent = total;
             currNum = total.toString();
-
-            /*
-            let y = numParser();
-            let x = queue.dequeue();
-            let operator = queue.dequeue();
-            let item = calculator.operate(operator, x, y);
-
-            currNum = "";
-            */
         }
     })
 }
@@ -232,11 +180,12 @@ function numParser(){
     return currNum;
 }
 
-
-/* Add event listener for display screen */
-/* Call queue accordingly */
-
-/* Once '=' is clicked, parse expression */
-
-/* SIGN ON CALCULATOR MEANS "S" IN QUEUE */
-/* ignore repeated operations (peek queue to check if operation was used) */
+function validSize(num){
+    let size = num.match(/\d/g);
+    size = [].concat.apply([], size);
+    console.log(size.length);
+    if(size.length < 10){
+        return true;
+    }
+    return false;
+}
